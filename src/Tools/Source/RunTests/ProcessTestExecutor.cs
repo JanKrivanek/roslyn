@@ -103,7 +103,15 @@ namespace RunTests
         public static string GetResultsFilePath(WorkItemInfo workItemInfo, Options options, string suffix = "xml")
         {
             var fileName = $"WorkItem_{workItemInfo.PartitionIndex}_{options.Architecture}_test_results.{suffix}";
-            return Path.Combine(options.TestResultsDirectory, fileName);
+            if (options.UseHelix)
+            {
+                // Helix tests run on a different machine, so we cannot use the directory from this machine.
+                return Path.Combine("%HELIX_WORKITEM_ROOT%", fileName);
+            }
+            else
+            {
+                return Path.Combine(options.TestResultsDirectory, fileName);
+            }
         }
 
         public async Task<TestResult> RunTestAsync(WorkItemInfo workItemInfo, Options options, CancellationToken cancellationToken)
